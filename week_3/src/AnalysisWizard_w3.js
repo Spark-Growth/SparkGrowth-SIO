@@ -22,6 +22,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Tooltip,
+  TextField,
 } from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import {
@@ -86,9 +87,9 @@ const AnalysisWizard = () => {
     topFunnel: [
       {
         title: "Morning Post Success",
-        description: "Posts between 8-10 AM show 20% higher reach",
         tooltipInfo:
-          "Analysis of 3-month posting data shows consistent performance peaks during morning hours",
+          "Analysis of 3-month posting data shows consistent performance peaks during morning hours. We analyzed engagement rates, reach, and user activity patterns across different time slots to identify optimal posting windows.",
+        description: "Posts between 8-10 AM show 20% higher reach",
         confidence: 87,
         metric: "+20%",
         trend: "positive",
@@ -187,9 +188,9 @@ const AnalysisWizard = () => {
       },
       {
         title: "Video Performance",
-        description: "Video content reaches 35% more users consistently",
         tooltipInfo:
-          "Video posts significantly outperform static images across all metrics",
+          "Video posts significantly outperform static images across all metrics. This insight was derived from comparing engagement rates, reach, and user behavior across different content types over a 3-month period.",
+        description: "Video content reaches 35% more users consistently",
         confidence: 92,
         metric: "+35%",
         trend: "positive",
@@ -289,12 +290,12 @@ const AnalysisWizard = () => {
       },
       {
         title: "Caption Length Impact",
-        description: "Posts with <100 characters perform better for awareness",
         tooltipInfo:
-          "Short, concise captions show higher impression rates in awareness campaigns",
+          "Short, concise captions show higher impression rates in awareness campaigns. This finding emerged from analyzing user engagement patterns and content performance metrics across varying caption lengths.",
+        description: "Posts with <100 characters perform better for awareness",
         confidence: 84,
         metric: "+25%",
-        trend: "negative",
+        trend: "positive",
         detailed_analysis: {
           methodology: {
             data_points: "428 posts analyzed in Q4 2023",
@@ -571,6 +572,16 @@ const AnalysisWizard = () => {
         <Typography variant="h6" gutterBottom>
           Performance Distribution
         </Typography>
+        <Typography variant="body2" sx={{ mb: 3, color: "text.secondary" }}>
+          This chart visualizes how your social media content performs across
+          different percentiles. The top 20% represents your highest-performing
+          posts that achieve exceptional engagement and reach, serving as
+          benchmarks for future content. The average line indicates typical
+          performance levels, while the bottom 20% identifies content that may
+          need optimization. Understanding this distribution helps focus your
+          content strategy on replicating successful patterns while improving
+          underperforming approaches.
+        </Typography>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={[
@@ -603,7 +614,22 @@ const AnalysisWizard = () => {
                       mb: 2,
                     }}
                   >
-                    <Typography variant="h6">{insight.title}</Typography>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography variant="h6">{insight.title}</Typography>
+                      <Tooltip
+                        title={
+                          <Typography sx={{ p: 1 }}>
+                            {insight.tooltipInfo}
+                          </Typography>
+                        }
+                        arrow
+                        placement="top"
+                      >
+                        <IconButton size="small" sx={{ ml: 1 }}>
+                          <InfoOutlined fontSize="small" color="primary" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                     <Box>
                       <Chip
                         label={`${insight.confidence}% confidence`}
@@ -940,7 +966,20 @@ const AnalysisWizard = () => {
 
   // Main render
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "grey.50" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "grey.50", pb: 10 }}>
+      <Typography
+        variant="h4"
+        sx={{
+          textAlign: "center",
+          py: 3,
+          borderBottom: 1,
+          borderColor: "divider",
+          fontWeight: "medium",
+        }}
+      >
+        SparkGrowth's SIO Agent
+      </Typography>
+
       {stage === "upload" && (
         <>
           {renderUpload()}
@@ -973,6 +1012,60 @@ const AnalysisWizard = () => {
           </Typography>
         </Box>
       )}
+
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "90%",
+          maxWidth: 800,
+          zIndex: 1000,
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            borderRadius: 30, // Highly rounded edges
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            bgcolor: "white",
+          }}
+        >
+          <TextField
+            fullWidth
+            placeholder="Ask me anything about your social media performance..."
+            variant="standard"
+            InputProps={{
+              disableUnderline: true,
+              sx: {
+                fontSize: "1rem",
+                pl: 2,
+                "& input": {
+                  padding: "8px 0",
+                },
+              },
+            }}
+          />
+          <IconButton
+            color="primary"
+            sx={{
+              bgcolor: "primary.main",
+              color: "white",
+              "&:hover": {
+                bgcolor: "primary.dark",
+              },
+              width: 40,
+              height: 40,
+            }}
+          >
+            <ArrowForward />
+          </IconButton>
+        </Paper>
+      </Box>
     </Box>
   );
 };
