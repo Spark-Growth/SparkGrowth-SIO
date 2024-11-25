@@ -23,6 +23,7 @@ import {
   AccordionDetails,
   Tooltip,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import {
@@ -57,6 +58,9 @@ const AnalysisWizard = () => {
   const [data, setData] = useState(null);
   const [expanded, setExpanded] = useState(true);
   const [embedError, setEmbedError] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   // Dropzone configuration
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -912,11 +916,11 @@ const AnalysisWizard = () => {
       </Grid>
 
       {/* Export Button */}
-      <Box sx={{ mt: 4 }}>
+      {/* <Box sx={{ mt: 4 }}>
         <Button variant="contained" size="large" endIcon={<CheckCircle />}>
           Export Analysis
         </Button>
-      </Box>
+      </Box> */}
     </Box>
   );
 
@@ -963,6 +967,23 @@ const AnalysisWizard = () => {
         </AccordionDetails>
       </Accordion>
     );
+
+  // Add this function to handle the streaming effect
+  const streamResponse = (response) => {
+    setIsTyping(true);
+    let index = 0;
+    const text =
+      "Based on the analysis of all of your post images, we noticed that lighter colors such as whites and pinks correlate with higher awareness.";
+
+    const interval = setInterval(() => {
+      setAiResponse(text.slice(0, index));
+      index++;
+      if (index > text.length) {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 10); // Adjust speed as needed
+  };
 
   // Main render
   return (
@@ -1037,6 +1058,8 @@ const AnalysisWizard = () => {
         >
           <TextField
             fullWidth
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask me anything about your social media performance..."
             variant="standard"
             InputProps={{
@@ -1052,6 +1075,10 @@ const AnalysisWizard = () => {
           />
           <IconButton
             color="primary"
+            onClick={() => {
+              streamResponse();
+              setInputValue("");
+            }}
             sx={{
               bgcolor: "primary.main",
               color: "white",
@@ -1066,6 +1093,28 @@ const AnalysisWizard = () => {
           </IconButton>
         </Paper>
       </Box>
+
+      {aiResponse && (
+        <Grid item xs={12}>
+          <Fade in timeout={1000}>
+            <Card sx={{ mt: 3, mb: 10 }}>
+              {" "}
+              {/* Added margin bottom for floating input */}
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Typography variant="h6">AI Analysis</Typography>
+                  {isTyping && (
+                    <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
+                      <CircularProgress size={20} />
+                    </Box>
+                  )}
+                </Box>
+                <Typography variant="body1">{aiResponse}</Typography>
+              </CardContent>
+            </Card>
+          </Fade>
+        </Grid>
+      )}
     </Box>
   );
 };
