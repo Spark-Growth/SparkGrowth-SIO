@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { parse } from "papaparse";
 import Anthropic from "@anthropic-ai/sdk";
+import { InstagramEmbed } from "react-social-media-embed";
 import {
   Box,
   Card,
@@ -96,12 +97,14 @@ const AnalysisWizard = () => {
             "justification": "2-3 sentences explaining the data analysis that led to this insight",
             "recommendations": ["2-3 specific, actionable recommendations"],
             "metric": "Key metric with +/- prefix",
-            "trend": "positive or negative"
+            "trend": "positive or negative",
+            "examplePosts": ["https://www.instagram.com/p/example1", "https://www.instagram.com/p/example2"]
           }
         ],
-        "summary": "2-3 sentence overview of the analysis"
+        "summary": "Detailed 3-4 paragraph overview of the analysis, including key trends, opportunities, and strategic recommendations"
       }
 
+      For each insight, please include URLs to 2 real Instagram posts that exemplify the recommendation.
       For Awareness/Reach goals, focus on impressions and visibility metrics.
       For Engagement goals, focus on likes, comments, and interaction metrics.
       For Conversion goals, focus on profile visits and action metrics.
@@ -143,13 +146,13 @@ const AnalysisWizard = () => {
         messages: [
           {
             role: "user",
-            content: `Context: You are analyzing Instagram data. Previous analysis: ${JSON.stringify(
-              analysisResults
-            )}
+            content: `Context: You are analyzing Instagram data. 
+            Raw Data: ${JSON.stringify(parsedData.fullData)}
+            Previous analysis: ${JSON.stringify(analysisResults)}
             
             Question: ${chatInput}
             
-            Please provide a concise, data-backed response.`,
+            Please provide a concise, data-backed response that references specific metrics and trends from the provided data.`,
           },
         ],
       });
@@ -328,6 +331,15 @@ const AnalysisWizard = () => {
         Analysis Results
       </Typography>
 
+      <Card sx={{ mb: 4, bgcolor: "primary.light", color: "white" }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Executive Summary
+          </Typography>
+          <Typography variant="body1">{analysisResults?.summary}</Typography>
+        </CardContent>
+      </Card>
+
       {analysisResults?.insights.map((insight, index) => (
         <Fade in timeout={1000} key={index}>
           <Card sx={{ mb: 3 }}>
@@ -362,6 +374,19 @@ const AnalysisWizard = () => {
                     • {rec}
                   </Typography>
                 ))}
+              </Box>
+
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Example Posts
+                </Typography>
+                <Grid container spacing={2}>
+                  {insight.examplePosts?.map((post, idx) => (
+                    <Grid item xs={12} md={6} key={idx}>
+                      <InstagramEmbed url={post} width="100%" />
+                    </Grid>
+                  ))}
+                </Grid>
               </Box>
             </CardContent>
           </Card>
