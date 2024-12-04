@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@testing-library/jest-dom": "^5.17.0",
