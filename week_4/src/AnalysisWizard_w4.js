@@ -102,14 +102,13 @@ const AnalysisWizard = () => {
           }
         ],
         "summary": "Detailed 3-4 paragraph overview of the analysis, including key trends, opportunities, and strategic recommendations"
-      }
+      }`;
 
-      For each insight, please include URLs to 2 real Instagram posts that exemplify the recommendation.
-      For Awareness/Reach goals, focus on impressions and visibility metrics.
-      For Engagement goals, focus on likes, comments, and interaction metrics.
-      For Conversion goals, focus on profile visits and action metrics.
-
-      Base all insights on actual patterns in the provided data.`;
+      console.log("🚀 Anthropic Analysis Request:", {
+        goal: selectedGoal,
+        dataPreview: parsedData.fullData.slice(0, 2),
+        timestamp: new Date().toISOString(),
+      });
 
       const message = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
@@ -118,9 +117,14 @@ const AnalysisWizard = () => {
         messages: [{ role: "user", content: prompt }],
       });
 
+      console.log("📦 Anthropic Analysis Response:", {
+        response: message.content[0].text,
+        timestamp: new Date().toISOString(),
+      });
+
       return JSON.parse(message.content[0].text);
     } catch (error) {
-      console.error("Analysis error:", error);
+      console.error("❌ Analysis error:", error);
       return null;
     }
   };
@@ -137,6 +141,13 @@ const AnalysisWizard = () => {
       const anthropic = new Anthropic({
         apiKey: process.env.REACT_APP_ANTHROPIC_API_KEY,
         dangerouslyAllowBrowser: true,
+      });
+
+      console.log("🚀 Anthropic Chat Request:", {
+        question: chatInput,
+        dataPreview: parsedData.fullData.slice(0, 2),
+        previousAnalysis: analysisResults,
+        timestamp: new Date().toISOString(),
       });
 
       const message = await anthropic.messages.create({
@@ -157,6 +168,11 @@ const AnalysisWizard = () => {
         ],
       });
 
+      console.log("📦 Anthropic Chat Response:", {
+        response: message.content[0].text,
+        timestamp: new Date().toISOString(),
+      });
+
       setChatHistory((prev) => [
         ...prev,
         {
@@ -165,7 +181,7 @@ const AnalysisWizard = () => {
         },
       ]);
     } catch (error) {
-      console.error("Chat error:", error);
+      console.error("❌ Chat error:", error);
     } finally {
       setIsTyping(false);
     }
