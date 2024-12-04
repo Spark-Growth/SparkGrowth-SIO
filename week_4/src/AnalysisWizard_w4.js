@@ -110,6 +110,7 @@ const AnalysisWizard = () => {
 
       const message = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
+        temperature: 0.1,
         max_tokens: 4096,
         messages: [{ role: "user", content: prompt }],
       });
@@ -137,6 +138,7 @@ const AnalysisWizard = () => {
 
       const message = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
+        temperature: 0.1,
         max_tokens: 4096,
         messages: [
           {
