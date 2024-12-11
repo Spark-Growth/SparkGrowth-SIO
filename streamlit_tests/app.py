@@ -10,6 +10,46 @@ load_dotenv()
 # Page config
 st.set_page_config(page_title="Slyndrx Posts Analyzer", page_icon="📊", layout="wide")
 
+# Initialize session state
+if "analysis_started" not in st.session_state:
+    st.session_state.analysis_started = False
+if "analysis_results" not in st.session_state:
+    st.session_state.analysis_results = {}
+if "summary" not in st.session_state:
+    st.session_state.summary = ""
+if "selected_category" not in st.session_state:
+    st.session_state.selected_category = None
+
+# Sidebar for file upload
+uploaded_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
+
+# Load data
+@st.cache_data
+def load_data(file):
+    return pd.read_csv(file)
+
+if uploaded_file:
+    df = load_data(uploaded_file)
+else:
+    st.sidebar.warning("Please upload a CSV file to proceed.")
+    st.stop()
+
+# Initialize OpenAI LLM and Pandas agent
+@st.cache_resource
+def get_agent():
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0
+    )
+    return create_pandas_dataframe_agent(
+        llm,
+        df,
+        verbose=True,
+        agent_type=AgentType.OPENAI_FUNCTIONS
+    )
+
+agent = get_agent()
+
 # Analysis questions by category
 QUESTION_CATEGORIES = {
     "Awareness & Reach": {
@@ -34,39 +74,6 @@ QUESTION_CATEGORIES = {
         "Save Rate Percentiles": "Create a DataFrame showing save rate percentiles (25th, 50th, 75th, 90th) grouped by content type."
     }
 }
-
-# Initialize session state
-if "analysis_started" not in st.session_state:
-    st.session_state.analysis_started = False
-if "analysis_results" not in st.session_state:
-    st.session_state.analysis_results = {}
-if "summary" not in st.session_state:
-    st.session_state.summary = ""
-if "selected_category" not in st.session_state:
-    st.session_state.selected_category = None
-
-# Load data
-@st.cache_data
-def load_data():
-    return pd.read_csv('posts_slyndrx_12_3_24.csv')
-
-df = load_data()
-
-# Initialize OpenAI LLM and Pandas agent
-@st.cache_resource
-def get_agent():
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0
-    )
-    return create_pandas_dataframe_agent(
-        llm,
-        df,
-        verbose=True,
-        agent_type=AgentType.OPENAI_FUNCTIONS
-    )
-
-agent = get_agent()
 
 def run_analysis():
     """Run the analysis for each question in the selected category"""
