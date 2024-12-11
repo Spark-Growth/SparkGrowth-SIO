@@ -26,7 +26,15 @@ uploaded_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
 # Load data
 @st.cache_data
 def load_data(file):
-    return pd.read_csv(file)
+    try:
+        df = pd.read_csv(file)
+        if df.empty:
+            st.error("The uploaded CSV file is empty. Please upload a valid file.")
+            st.stop()
+        return df
+    except Exception as e:
+        st.error(f"Error loading CSV file: {e}")
+        st.stop()
 
 if uploaded_file:
     df = load_data(uploaded_file)
@@ -37,16 +45,20 @@ else:
 # Initialize OpenAI LLM and Pandas agent
 @st.cache_resource
 def get_agent():
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0
-    )
-    return create_pandas_dataframe_agent(
-        llm,
-        df,
-        verbose=True,
-        agent_type=AgentType.OPENAI_FUNCTIONS
-    )
+    try:
+        llm = ChatOpenAI(
+            model="gpt-4o-mini",
+            temperature=0
+        )
+        return create_pandas_dataframe_agent(
+            llm,
+            df,
+            verbose=True,
+            agent_type=AgentType.OPENAI_FUNCTIONS
+        )
+    except ValueError as e:
+        st.error(f"Error creating agent: {e}")
+        st.stop()
 
 agent = get_agent()
 
