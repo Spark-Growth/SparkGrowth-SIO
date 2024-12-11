@@ -54,7 +54,8 @@ def get_agent():
             llm,
             df,
             verbose=True,
-            agent_type=AgentType.OPENAI_FUNCTIONS
+            agent_type=AgentType.OPENAI_FUNCTIONS,
+            allow_dangerous_code=True  #
         )
     except ValueError as e:
         st.error(f"Error creating agent: {e}")
